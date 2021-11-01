@@ -12,7 +12,6 @@ loss_flag = 0
 out_flag = 0
 pixels_3d_flag = 0
 
-for the report
 if len(sys.argv) >= 5:
     if sys.argv[4] == "-i":
         out_flag = 1
