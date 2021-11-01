@@ -31,7 +31,7 @@ Also, the program gets 3 flags which can be added at the end of the arguments:
 
 running example (with ```-i``` and ```-p``` flags):
 ```
-	$ python3 ex1.py dog.jpeg cents1.txt out.txt -i -p
+	$ python3 ex1.py dog.jpeg cents_k2means.txt out.txt -i -p
 ```
 ## Dependencies
 * [Python 3.6+](https://www.python.org/downloads/)
@@ -48,5 +48,5 @@ running example (with ```-i``` and ```-p``` flags):
 	```	
 3. Run the ex1.py file:
 	```
-	$ python3 ex1.py dog.jpeg cents1.txt out.txt -i -l -p
+	$ python3 ex1.py dog.jpeg cents_k2means.txt out.txt -i -l -p
 	 ```
