@@ -13,25 +13,39 @@ Implementation of a K-Means Clustering machine learning algorithm.
 ### Background
 Implementation of the ```K-Means``` algorithm in python, which allows you to turn an image displayed by lots of different colors into an image that contains a specific number of colors (k). This machine learning algorithm allows easy compression of the image.
 
-By an image file, a ```txt``` file containing 3D points (RGB pixels values) and a cupel of flags, the algorithm can be run on the image with the clusters specified in the ```txt``` file. After about 20 epochs or after the algorithm has converged, the program will export to an output file, the new cluster locations. You can also add flags to export the image obtained after running the algorithm, export the loss function graph during the iterations and also export a 3D diagram of the positions of the pixels and the centroids, before and after the algorithm run.
+By an image file, a number of colors and a couple of flags, the algorithm can be run on the image with the k that given by the user. After about 20 epochs or after the algorithm has converged, the program will export to an output files, the new image, a 3D model of the image (before and ater the algorithm), a ```.txt``` file that contains the k colors that the algorithm found to be the best, a ```.txt``` file that contains the minimum loss of the new image and a loss function graph. All of that of course, with the corresponding flags.
 
 The 3D pixel diagram file that describing the state of the ```pixels``` and the ```centroids``` before running the algorithm, contains the pixels in their ```current color``` and in their location in the 3D graph, as well as contains the yellow and slightly larger centroids.
 The 3D pixel diagram file that describing the image after the algorithm runs, contains the ```positions``` of the ```centroids``` (RGB values) in the three-dimensional space after moving during the algorithm, as well as in their new color.
 
-### Running Instructions
-In order to run the program, one has to create a ```txt``` file containing 3 numbers between 0 and 1 in each row separated by spaces. The number of rows will be the number of centroids to be used in the algorithm (k).
+The ```ex1.py``` code makes about 20 attempts to match the new colors to the image (using a K-Means algorithm that is executed over and over again), so that it can check at which time the lowest ```loss function``` was obtained. After realizing which colors are causing a lowest error, the program produces the new image as well as the rest of the files as described above.
 
-The algorithm receives as input a number of arguments in the following order:
-First, the path to the ```image file``` (jpeg file). then a path to the ```centroids file``` (txt file) and a file name that the program will create in order to export the centroids positions obtained after running the algorithm.
+The ```find_k.py``` code checkes all of the possible k's between 2 and 20 (by repeatedly running ```ex1.py``` with the ```-l``` flag), finds the loss of each of these k's and exports the information to a graph. Using this graph you can see which k brings the best results and use it to run ```ex1.py``` in order to export the final image.
 
-Also, the program gets 3 flags which can be added at the end of the arguments:
-* flag ```-i``` which instructs the program to export the image obtained after running the algorithm.
-* flag ```-l``` which instructs the program to export the loss function graph to the file.
-* flag ```-p``` which directs the program to export a pair of images of the state of the pixels and centroids in three-dimensional space before and after running the algorithm. Note that this flag may cause the program to run for a long time.
+You can see in the "output" folder examples of files that the algorithm created after running.### Running Instructions
+#### ex1.py
+The algorithm receives a couple of arguments in the following order:
+First, the path to the ```image file``` (jpeg file). then a number (integer) that will be the number of colors the algorithm will used.
+
+Also, the program gets up to 6 flags which can be added after the numbers of color argument:
+* flag ```-c``` which instructs the program to export a ```colors_k{k}.txt``` file that contains the k colors that been use in the final image.
+* flag ```-g``` which instructs the program to export the loss function graph to the ```loss_graph_k{k}.png``` file.
+* flag ```-l``` which instructs the program to export the minimun loss value to the ```loss_k{k}.txt``` file.
+* flag ```-i``` which instructs the program to export the image obtained after running the algorithm to the ```final_image_k{k}.jpeg``` file.
+* flag ```-p``` which instructs the program to export a pair of images of the state of the pixels and centroids in three-dimensional space before and after running the algorithm. Note that this flag may cause the program to run for a long time.
+* flag ```-o``` which instructs the program to perform only one round for the same k, of course while calculating all the other data. This flag should be used when it isn't necessary to find the minimum loss function or to calculate the final image in a shorter time.
+
 
 running example (with ```-i``` and ```-p``` flags):
 ```
-	$ python3 ex1.py dog.jpeg cents_k2means.txt out.txt -i -p
+	$ python3 ex1.py dog.jpeg 2 -i -p
+```
+#### find_k.py
+The program executes a call to ex1.py with any k between 2-20. The program receives as argument a path to the image file (jpeg file) on which the algorithm should be run each time. Running the program takes some time but you can save it by adding the ```-o``` flag which will cause the program to run for each k only once (actually, running ```ex1.py``` for each k with the ```-o``` flag).
+
+running example (with ```-o``` flag):
+```
+	$ python3 find_k.py dog.jpeg -o
 ```
 ## Dependencies
 * [Python 3.6+](https://www.python.org/downloads/)
@@ -46,7 +60,11 @@ running example (with ```-i``` and ```-p``` flags):
 	```
 	$ git clone https://github.com/tomershay100/K-Means-Clustering-Algorithm.git
 	```	
-3. Run the ex1.py file:
+3. Run the ```ex1.py``` file:
 	```
-	$ python3 ex1.py dog.jpeg cents_k2means.txt out.txt -i -l -p
+	$ python3 ex1.py dog.jpeg 16 -i -l -p -c -g -o
+	 ```
+4. Or run the ```find_k.py``` file:
+	```
+	$ python3 find_k.py dog.jpeg -o
 	 ```
