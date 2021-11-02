@@ -1,43 +1,28 @@
 # Tomer Shay, 323082701
+import random
 
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
 
+if len(sys.argv) < 2:
+    print("not enough arguments!")
+    exit(-1)
 img_file_name = sys.argv[1]
-centroid_file_name = sys.argv[2]
-out_file_name = sys.argv[3]
 
-loss_flag = 0
-out_flag = 0
-pixels_3d_flag = 0
+if len(sys.argv) < 3:
+    print("you must enter the number of colors (k)!")
+    exit(-1)
+k = int(sys.argv[2])
 
-if len(sys.argv) >= 5:
-    if sys.argv[4] == "-i":
-        out_flag = 1
-    elif sys.argv[4] == "-l":
-        loss_flag = 1
-    elif sys.argv[4] == "-p":
-        pixels_3d_flag = 1
+# flags
+colors_flag = "-c" in sys.argv
+loss_graph_flag = "-g" in sys.argv
+loss_value_flag = "-l" in sys.argv
+image_out_flag = "-i" in sys.argv
+pixels_3d_flag = "-p" in sys.argv
+only_one = "-o" in sys.argv
 
-if len(sys.argv) >= 6:
-    if sys.argv[5] == "-i":
-        out_flag = 1
-    elif sys.argv[5] == "-l":
-        loss_flag = 1
-    elif sys.argv[5] == "-p":
-        pixels_3d_flag = 1
-
-if len(sys.argv) == 7:
-    if sys.argv[6] == "-i":
-        out_flag = 1
-    elif sys.argv[6] == "-l":
-        loss_flag = 1
-    elif sys.argv[6] == "-p":
-        pixels_3d_flag = 1
-
-centroids = np.loadtxt(centroid_file_name)
-orig_cents = centroids.copy()
 orig_pixels = plt.imread(img_file_name)
 img_pixels = orig_pixels.astype(float) / 255.
 orig_pixels = img_pixels.copy()
@@ -117,48 +102,90 @@ def calc_loss(cents_map, cents):
     return dist_sum / len(img_pixels)
 
 
-output_text, output_line, output_line_before = "", "", ""
-centroids_map = {}
+def rand_rgb():
+    temp = []
+    for _ in range(3):
+        temp.append(random.randint(0, 255) / 255.)
+    return temp
 
-loss_val = []
-iter_val = []
 
-for iter in range(20):
-    centroids_map = iteration(centroids)
-    new_centroids = np.array(change_cents(centroids_map)).round(4)
-    output_line = f"[iter {iter}]:{','.join([str(i) for i in new_centroids])}\n"
-    output_text += output_line
-    if np.array_equal(new_centroids, centroids):  # all centroids doesn't move at all
+loss_cents_map = {}
+
+num_of_checks = 20
+if only_one:
+    num_of_checks = 1
+
+for i in range(num_of_checks):
+
+    centroids = []
+    for _ in range(k):
+        centroids.append(rand_rgb())
+    orig_cents = centroids.copy()
+
+    centroids_map = {}
+
+    loss_values = []
+    iter_values = []
+    new_centroids = []
+
+    for iter in range(50):
+        centroids_map = iteration(centroids)
+        new_centroids = np.array(change_cents(centroids_map)).round(4)
+
+        if np.array_equal(new_centroids, centroids):  # all centroids didn't move at all
+            break
+        centroids = new_centroids
+
+        loss_values.append(calc_loss(centroids_map, centroids))
+        iter_values.append(iter)
+
+    loss_cents_map[round(loss_values[-1], 2)] = {"centroids": centroids.copy(), "original centroids": orig_cents.copy(),
+                                                 "loss values": loss_values.copy(),
+                                                 "iteration values": iter_values.copy(),
+                                                 "centroids map": centroids_map.copy()}
+
+    if (i > 5 and len(loss_cents_map.keys()) == 1) or (i > 10 and len(loss_cents_map.keys()) <= 3):
         break
-    centroids = new_centroids
+    print(f"[iter {i}]: loss: {round(loss_values[-1], 2)}")
 
-    if loss_flag:
-        loss_val.append(calc_loss(centroids_map, centroids))
-        iter_val.append(iter)
+min_key = min(loss_cents_map.keys())
+min_values = loss_cents_map[min_key]
 
-f = open(out_file_name, "w")
-f.write(output_text)
-f.close()
+if colors_flag:  # if there is -c flag, output the final chosen colors to "colors_k{k}.txt" file.
+    file_name_str = f"colors_k{k}.txt"
+    f = open(file_name_str, "w")
+    f.write(f"{','.join([str(i) for i in np.array(min_values['centroids'] * 225).astype(int)])}")
+    f.close()
+    print(f"{file_name_str} contains the only {len(min_values['centroids'])} colors that been used in the final image.")
 
-if out_flag:  # if there is -i flag, create the output compressed file.
-    for i in range(len(centroids_map)):
-        for j in range(len(centroids_map[i])):
-            pixels[centroids_map[i][j]] = centroids[i]  # change the pixel by its centroid
+if loss_value_flag:  # if there is -l flag, output the final loss value to "loss_k{k}.txt" file.
+    file_name_str = f"loss_k{k}.txt"
+    f = open(file_name_str, "w")
+    f.write(f"{min_key}")
+    f.close()
+    print(f"{file_name_str} contains the final loss value of the best iteration.")
+
+if image_out_flag:  # if there is -i flag, create the output compressed file.
+    for i in range(len(min_values["centroids map"])):
+        for j in range(len(min_values["centroids map"][i])):
+            pixels[min_values["centroids map"][i][j]] = min_values["centroids"][i]  # change the pixel by its centroid
 
     img_pixels = pixels.reshape(128, 128, 3)
-    file_name_str = "image_k" + str(len(centroids)) + "means.jpeg"
+    file_name_str = f"final_image_k{k}.jpeg"
     plt.imsave(file_name_str, img_pixels)
+    print(f"{file_name_str} contains the final image with only {len(min_values['centroids'])} colors.")
 
-if loss_flag:  # if there is -l flag, create the output loss function graph.
-    plt.plot(iter_val, loss_val)
+if loss_graph_flag:  # if there is -g flag, create the output loss function graph.
+    plt.plot(min_values["iteration values"], min_values["loss values"])
 
-    plt.text(iter_val[-1], loss_val[-1], str(round(loss_val[-1], 1)))
+    plt.text(min_values["iteration values"][-1], min_values["loss values"][-1],
+             str(round((min_values["loss values"])[-1], 2)))
 
     plt.xlabel('iteration')
     plt.ylabel('loss value')
-    title_str = "K-Means, k = " + str(len(centroids))
+    title_str = "K-Means, k = " + str(len(min_values["centroids"]))
     plt.title(title_str)
-    file_name_str = "graph_k" + str(len(centroids)) + "means.png"
+    file_name_str = f"loss_graph_k{k}.png"
     plt.savefig(file_name_str)
 
 if pixels_3d_flag:  # if there is -p flag, create the output pixels graph.
@@ -172,7 +199,7 @@ if pixels_3d_flag:  # if there is -p flag, create the output pixels graph.
         b_val = pixel[2]
         ax.scatter(r_val * 255, g_val * 255, b_val * 255, facecolor=(r_val, g_val, b_val))
 
-    for centroid in orig_cents:  # original centroids, before the k-means algorithm
+    for centroid in min_values["original centroids"]:  # original centroids, before the k-means algorithm
         r_val = centroid[0]
         g_val = centroid[1]
         b_val = centroid[2]
@@ -182,14 +209,18 @@ if pixels_3d_flag:  # if there is -p flag, create the output pixels graph.
     ax.set_ylabel('Green')
     ax.set_zlabel('Blue')
     ax.view_init(25, 10)
-    title_str = "K-Means, k = " + str(len(centroids))
+    title_str = "K-Means, k = " + str(len(min_values["centroids"]))
     plt.title(title_str)
-    plt.savefig("all_pixels" + str(len(centroids)) + "_before.png")
+    file_name_str = f"3D_model_init_k{k}.png"
+    plt.savefig(file_name_str)
+
+    print(f"{file_name_str} contains the centroids and the pixels position in a 3D space. The centroids are bigger and "
+          f"their color is yellow.")
 
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
 
-    for centroid in centroids:  # new centroids, after the k-means algorithm
+    for centroid in min_values["centroids"]:  # new centroids, after the k-means algorithm
         r_val = centroid[0]
         g_val = centroid[1]
         b_val = centroid[2]
@@ -200,6 +231,8 @@ if pixels_3d_flag:  # if there is -p flag, create the output pixels graph.
     ax.set_ylabel('Green')
     ax.set_zlabel('Blue')
     ax.view_init(20, 10)
-    title_str = "K-Means, k = " + str(len(centroids))
+    title_str = "K-Means, k = " + str(len(min_values["centroids"]))
     plt.title(title_str)
-    plt.savefig("all_pixels" + str(len(centroids)) + "_after.png")
+    file_name_str = f"3D_model_after_k{k}.png"
+    plt.savefig(file_name_str)
+    print(f"{file_name_str} contains the centroids position in a 3D space. The centroid's color is their real color.")
