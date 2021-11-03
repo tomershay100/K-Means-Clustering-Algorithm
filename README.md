@@ -17,6 +17,11 @@ Implementation of the ```K-Means``` algorithm in python, which allows you to tur
 
 By an image file, a number of colors and a couple of flags, the algorithm can be run on the image with the k that given by the user. After about 20 epochs or after the algorithm has converged, the program will export to an output files the new image, a 3D model of the image (before and ater the algorithm), a ```.txt``` file that contains the k colors that the algorithm found to be the best, a ```.txt``` file that contains the minimum loss of the new image and a loss function graph. All of that of course, with the corresponding flags.
 
+#### How does the algorithm work briefly?
+Randomly initialize number ```k``` of centroids in three-dimensional space (between 0 and 255). After going over all the pixels in the image, each pixel is associated with its nearest centroid. Then, the centroids value is updated to be the average pixel value (out of the pixels belonging to it). This process is called ```epoch```. In the code about 20 epochs are performed or when none of the centroids has changed position (i.e. the algorithm has reached convergence). All of this happens 20 times (when the ```-o``` flag is not given) in order to find the centroid best position in the space.
+
+An error calculation (```loss```) is made by summing the distances between each pixel and the nearest centroid (and then dividing by the number of pixels). As the loss is smaller, the new image becomes more and more similar to the original image. The ```loss function``` is a function of the loss value after each epoch. The goal: As more iterations have passed, the loss value decreases.
+
 ### Program Structure
 The ```k_means.py``` code makes about 20 attempts to match the new colors to the image (using a K-Means algorithm that is executed over and over again), so that it can check at which time the lowest ```loss function``` was obtained. After realizing which colors are causing a lowest error, the program produces the new image as well as the rest of the files as described above.
 
