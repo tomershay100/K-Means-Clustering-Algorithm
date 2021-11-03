@@ -5,8 +5,8 @@ Implementation of a K-Means Clustering machine learning algorithm.
 1. [General](#General)
     - [Background](#background)
     - [Program Structure](https://github.com/tomershay100/K-Means-Clustering-Algorithm/blob/main/README.md#program-structure)
-    - [Running Instructions](https://github.com/tomershay100/K-Means-Clustering-Algorithm/blob/main/README.md#running-instructions)
     - [About The Output Files](https://github.com/tomershay100/K-Means-Clustering-Algorithm/blob/main/README.md#about-the-output-files)
+    - [Running Instructions](https://github.com/tomershay100/K-Means-Clustering-Algorithm/blob/main/README.md#running-instructions)
 2. [Dependencies](#dependencies) 
 3. [Installation](#installation)
 
@@ -59,7 +59,7 @@ running example (with ```-i``` and ```-p``` flags):
 	$ python3 k_means.py dog.jpeg 2 -i -p
 ```
 #### find_k.py
-The program executes a call to ex1.py with any k between 2-20. The program receives as argument a path to the image file (jpeg file) on which the algorithm should be run each time. Running the program takes some time but you can save it by adding the ```-o``` flag which will cause the program to run for each k only once (actually, running ```k_means.py``` for each k with the ```-o``` flag).
+The program executes a call to ```k_means.py``` with any k between 2-20. The program receives as argument a path to the image file (jpeg file) on which the algorithm should be run each time. Running the program takes some time but you can save it by adding the ```-o``` flag which will cause the program to run for each k only once (actually, running ```k_means.py``` for each k with the ```-o``` flag).
 
 running example (with ```-o``` flag):
 ```
