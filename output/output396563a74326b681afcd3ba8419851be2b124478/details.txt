@@ -1,0 +1,7 @@
+This output folder contains all the output files for the K-Means algorithm with k = 8 on the dog.jpeg image file.
+The flags used in the algorithm are: -c -g -l -i -o 
+
+
+colors_k8.txt contains the only 8 colors that been used in the final image. 
+loss_k8.txt contains the final loss value of the best iteration.
+final_image_k8.jpeg contains the final image with only 8 colors.loss_graph_k8.png contains the loss function graph of the algorithm.

@@ -1,0 +1,6 @@
+This output folder contains all the output files for the K-Means algorithm with k = 4 on the cat.jpeg image file.
+The flags used in the algorithm are: -l -i -o 
+
+
+loss_k4.txt contains the final loss value of the best iteration.
+final_image_k4.jpeg contains the final image with only 4 colors.

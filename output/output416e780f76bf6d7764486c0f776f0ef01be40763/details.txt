@@ -1,0 +1,8 @@
+This output folder contains all the output files for the K-Means algorithm with k = 2 on the dog.jpeg image file.
+The flags used in the algorithm are: -c -g -l -i -p -o 
+
+
+colors_k2.txt contains the only 2 colors that been used in the final image. 
+loss_k2.txt contains the final loss value of the best iteration.
+final_image_k2.jpeg contains the final image with only 2 colors.loss_graph_k2.png contains the loss function graph of the algorithm.
+3D_model_init_k2.png contains the centroids and the pixels position in a 3D space. The centroids are bigger and their color is yellow. 3D_model_after_k2.png contains the centroids position in a 3D space. The centroid's color is their real color. 
